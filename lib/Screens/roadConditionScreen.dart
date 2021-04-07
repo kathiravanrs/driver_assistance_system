@@ -16,6 +16,7 @@ class RoadConditionPage extends StatefulWidget {
 
 class _RoadConditionPageState extends State<RoadConditionPage> {
   final dbRef = FirebaseDatabase.instance.reference().child("RoadCondition");
+  final dbRefLoc = FirebaseDatabase.instance.reference().child("LastPosition");
 
   Position _currentPosition;
   String _currentAddress;
@@ -34,6 +35,7 @@ class _RoadConditionPageState extends State<RoadConditionPage> {
 
   _getCurrentLocation() async{
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    // dbRefLoc.push().set({"Position":LatLng(position.latitude,position.longitude).toString()});
 
     setState(() {
         marker.add(Marker(markerId: MarkerId('jg'),position: LatLng(position.latitude,position.longitude)));
@@ -64,7 +66,7 @@ class _RoadConditionPageState extends State<RoadConditionPage> {
   @override
   void initState() {
     super.initState();
-    timer = Timer.periodic(Duration(seconds: 5), (Timer t) => _getCurrentLocation());
+    // timer = Timer.periodic(Duration(seconds: 5), (Timer t) => _getCurrentLocation());
   }
 
   @override
@@ -84,10 +86,12 @@ class _RoadConditionPageState extends State<RoadConditionPage> {
             builder: (context, AsyncSnapshot<DataSnapshot> snapshot) {
               if (snapshot.hasData) {
                 List<dynamic> goodSeg = (snapshot.data.value["GoodSegments"]);
-                List<dynamic> badSeg = (snapshot.data.value["BadSegments"]);
+                print(goodSeg);
 
+                Map<dynamic, dynamic> badSeg = (snapshot.data.value["BadSegments"]);
+                print(badSeg.values);
                 addToPolyline(goodSeg, Road.good);
-                addToPolyline(badSeg, Road.bad);
+                addToPolyline(badSeg.values.toList(), Road.bad);
 
                 return Stack(
                   children: <Widget>[

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'dart:async';
 
 import 'Screens/homescreen.dart';
 import 'Screens/driverDetailsScreen.dart';
@@ -26,11 +30,25 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 class _MyAppState extends State<MyApp> {
+  Timer timer;
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+  final dbRef = FirebaseDatabase.instance.reference().child("LastPosition");
+
+  _getCurrentLocation() async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    dbRef.push().set({
+      "Position": LatLng(position.latitude, position.longitude).toString(),
+      "timestamp": DateTime.now().millisecondsSinceEpoch
+    });
+    print("Updated from Main");
+  }
 
   @override
   void initState() {
     super.initState();
+    // timer = Timer.periodic(
+    //     Duration(seconds: 5), (Timer t) => _getCurrentLocation());
   }
 
   @override
