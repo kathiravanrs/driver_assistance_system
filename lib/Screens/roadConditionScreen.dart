@@ -33,15 +33,14 @@ class _RoadConditionPageState extends State<RoadConditionPage> {
   }
 
 
-  _getCurrentLocation() async{
-    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    // dbRefLoc.push().set({"Position":LatLng(position.latitude,position.longitude).toString()});
-
-    setState(() {
-        marker.add(Marker(markerId: MarkerId('jg'),position: LatLng(position.latitude,position.longitude)));
-        _currentPosition = position;
-      });
-  }
+  // _getCurrentLocation() async{
+  //   Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  //   // dbRefLoc.push().set({"Position":LatLng(position.latitude,position.longitude).toString()});
+  //   setState(() {
+  //       marker.add(Marker(markerId: MarkerId('jg'),position: LatLng(position.latitude,position.longitude)));
+  //       _currentPosition = position;
+  //     });
+  // }
 
 
 

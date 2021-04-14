@@ -5,6 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
+import 'dart:convert';
 
 import 'Screens/homescreen.dart';
 import 'Screens/driverDetailsScreen.dart';
@@ -12,8 +13,8 @@ import 'Screens/rashDrivingScreen.dart';
 import 'Screens/roadConditionScreen.dart';
 
 void main() {
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   WidgetsFlutterBinding.ensureInitialized();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(MyApp());
 }
 
@@ -29,26 +30,74 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Handling a background message: ${message.messageId}");
 }
 
+enum Road { good, bad }
+
 class _MyAppState extends State<MyApp> {
   Timer timer;
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
-  final dbRef = FirebaseDatabase.instance.reference().child("LastPosition");
+  final dbRef = FirebaseDatabase.instance.reference();
 
   _getCurrentLocation() async {
-    Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    dbRef.push().set({
-      "Position": LatLng(position.latitude, position.longitude).toString(),
-      "timestamp": DateTime.now().millisecondsSinceEpoch
+    Position secondLastPosition;
+    Road condition;
+
+    await dbRef
+        .child('LastPosition/Kathiravan/Last')
+        .once()
+        .then((DataSnapshot snapshot) {
+      var data = json.decode(snapshot.value['Position']);
+      print(data[0]);
+      secondLastPosition = Position(longitude: data[0], latitude: data[1]);
+      print(secondLastPosition);
     });
+
+    await dbRef.child('CurrentRoad').once().then((DataSnapshot snapshot) {
+      if (snapshot.value['Condition'].toString() == 'Bad') {
+        condition = Road.bad;
+      } else if (snapshot.value['Condition'].toString() == 'Good') {
+        condition = Road.good;
+      }
+    });
+
+    Position lastPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+
+    dbRef.child('LastPosition/Kathiravan/Last').set({
+      "Position": [lastPosition.latitude, lastPosition.longitude].toString(),
+      "timestamp": DateTime.now().millisecondsSinceEpoch,
+    });
+
+    dbRef.child('LastPosition/Kathiravan/SecondLast').set({
+      "Position": [secondLastPosition.latitude, secondLastPosition.longitude]
+          .toString(),
+      "timestamp": DateTime.now().millisecondsSinceEpoch,
+    });
+
+    if (condition == Road.good) {
+      dbRef.child('RoadCondition/GoodSegments').push().set({
+        'StartLat': lastPosition.latitude,
+        "StartLng": lastPosition.longitude,
+        "StopLat": secondLastPosition.latitude,
+        "StopLng": secondLastPosition.longitude
+      });
+      print('Good Road');
+    } else if (condition == Road.bad) {
+      dbRef.child('RoadCondition/BadSegments').push().set({
+        'StartLat': lastPosition.latitude,
+        "StartLng": lastPosition.longitude,
+        "StopLat": secondLastPosition.latitude,
+        "StopLng": secondLastPosition.longitude
+      });
+      print('Bad Road');
+    }
     print("Updated from Main");
   }
 
   @override
   void initState() {
     super.initState();
-    // timer = Timer.periodic(
-    //     Duration(seconds: 5), (Timer t) => _getCurrentLocation());
+    timer = Timer.periodic(
+        Duration(seconds: 5), (Timer t) => _getCurrentLocation());
   }
 
   @override
