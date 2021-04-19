@@ -24,7 +24,6 @@ class MyApp extends StatefulWidget {
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // If you're going to use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
   await Firebase.initializeApp();
   print("Handling a background message: ${message.messageId}");
@@ -47,7 +46,7 @@ class _MyAppState extends State<MyApp> {
         .then((DataSnapshot snapshot) {
       var data = json.decode(snapshot.value['Position']);
       print(data[0]);
-      secondLastPosition = Position(longitude: data[0], latitude: data[1]);
+      secondLastPosition = Position(latitude: data[0], longitude: data[1]);
       print(secondLastPosition);
     });
 
@@ -90,14 +89,13 @@ class _MyAppState extends State<MyApp> {
       });
       print('Bad Road');
     }
-    print("Updated from Main");
   }
 
   @override
   void initState() {
     super.initState();
     timer = Timer.periodic(
-        Duration(seconds: 5), (Timer t) => _getCurrentLocation());
+        Duration(seconds: 60), (Timer t) => _getCurrentLocation());
   }
 
   @override
