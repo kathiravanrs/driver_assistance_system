@@ -3,14 +3,14 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
 import 'dart:convert';
 
-import 'Screens/homescreen.dart';
 import 'Screens/driverDetailsScreen.dart';
 import 'Screens/rashDrivingScreen.dart';
 import 'Screens/roadConditionScreen.dart';
+import 'Screens/root_page.dart';
+import 'auth.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +32,7 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 enum Road { good, bad }
 
 class _MyAppState extends State<MyApp> {
+
   Timer timer;
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
   final dbRef = FirebaseDatabase.instance.reference();
@@ -135,7 +136,7 @@ class _MyAppState extends State<MyApp> {
                   '/driver': (BuildContext context) => new DriverPage(),
                   '/rash': (BuildContext context) => new RashDrivingPage(),
                   '/road': (BuildContext context) => new RoadConditionPage(),
-                  '/': (BuildContext context) => new MyHomePage(),
+                  '/': (BuildContext context) => new RootPage(auth: new Auth()),
                 });
           }
           return Center(

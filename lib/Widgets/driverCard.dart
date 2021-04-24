@@ -4,8 +4,9 @@ class DriverCard extends StatefulWidget {
   final String driverName;
   final String vehNumber;
   final String rashCount;
+  final String state;
 
-  DriverCard({this.driverName, this.vehNumber, this.rashCount});
+  DriverCard({this.driverName, this.vehNumber, this.rashCount, this.state});
 
   @override
   _DriverCardState createState() => _DriverCardState();
@@ -28,10 +29,37 @@ class _DriverCardState extends State<DriverCard> {
           elevation: 10,
           child: Row(
             children: [
-              Icon(
-                Icons.perm_contact_cal_rounded,
-                size: 120,
-              ),
+              if (widget.state == "Awake")
+                Container(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(8.0,15.0,0,10),
+                        child: Icon(
+                          Icons.electric_car_rounded,
+                          size: 120,
+                        ),
+                      ),
+
+                      Text("Awake",style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                    ],
+                  ),
+                ),
+              if (widget.state == "Drowsy")
+                Container(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(8.0,15.0,0,10),
+                        child: Icon(
+                          Icons.bedtime,
+                          size: 120,
+                        ),
+                      ),
+                      Text("Drowsy",style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                    ],
+                  ),
+                ),
               SizedBox(
                 width: 20,
               ),

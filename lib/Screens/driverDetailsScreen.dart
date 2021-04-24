@@ -42,10 +42,12 @@ class _DriverPageState extends State<DriverPage> {
                       var name = values[index]["Name"];
                       var number = values[index]["Vehicle"];
                       var rash = values[index]["Rash"].toString();
+                      var driverState = values[index]["State"].toString();
                       return DriverCard(
                         driverName: name,
                         vehNumber: number,
                         rashCount: rash,
+                        state: driverState,
                       );
                     });
               }
