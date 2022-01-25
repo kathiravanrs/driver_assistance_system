@@ -8,7 +8,7 @@
        android:label="Driver Assistance System"
        android:icon="@mipmap/ic_launcher">
     <meta-data android:name="com.google.android.geo.API_KEY"
-        android:value="AIzaSyAGbNAImCx2qZIN8qCmO4Mqfyd32CzVgVo"/>
+        android:value=""/>
 
         <activity
             android:name=".MainActivity"
